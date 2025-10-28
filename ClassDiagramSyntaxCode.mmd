@@ -1,0 +1,90 @@
+classDiagram
+    direction LR
+
+    class GerenciadorMidiaSocial {
+        <<Cliente>>
+        -SocialMediaFactory factory
+        -Configuracao config
+        +publicarEm(Plataforma, Conteudo)
+        +publicarEmMassa(List~Plataforma~, Conteudo)
+    }
+
+    class SocialMediaFactory {
+        <<Fábrica>>
+        +criarAdapter(Plataforma, Configuracao) ISocialMediaAdapter
+    }
+
+    class Configuracao {
+        +getProperty(String) String
+    }
+
+    class ISocialMediaAdapter {
+        <<Interface>>
+        <<Target / Strategy>>
+        +postar(Conteudo) PublicacaoResposta
+        +obterEstatisticas(String) Estatisticas
+    }
+
+    class TwitterAdapter {
+        <<Adapter / ConcreteStrategy>>
+        -TwitterAPI adaptee
+        +postar(Conteudo) PublicacaoResposta
+        +obterEstatisticas(String) Estatisticas
+    }
+    
+    class InstagramAdapter {
+        <<Adapter / ConcreteStrategy>>
+        -InstagramAPI adaptee
+        +postar(Conteudo) PublicacaoResposta
+        +obterEstatisticas(String) Estatisticas
+    }
+
+    class LinkedInAdapter {
+        <<Adapter / ConcreteStrategy>>
+        -LinkedInAPI adaptee
+        +postar(Conteudo) PublicacaoResposta
+        +obterEstatisticas(String) Estatisticas
+    }
+
+    class TwitterAPI {
+        <<Adaptee>>
+        +tweet(String) String
+        +getTweetStats(String) String
+    }
+    
+    class InstagramAPI {
+        <<Adaptee>>
+        +postarFoto(String, String) int
+    }
+
+    class LinkedInAPI {
+        <<Adaptee>>
+        +shareUpdate(String) String
+    }
+    
+    namespace models {
+        class Conteudo
+        class PublicacaoResposta
+        class Estatisticas
+    }
+
+    GerenciadorMidiaSocial --> SocialMediaFactory : usa
+    GerenciadorMidiaSocial --> Configuracao : usa
+    GerenciadorMidiaSocial ..> ISocialMediaAdapter : usa
+    
+    SocialMediaFactory ..> ISocialMediaAdapter : cria
+    SocialMediaFactory --> Configuracao : usa
+    SocialMediaFactory ..> TwitterAdapter : cria
+    SocialMediaFactory ..> InstagramAdapter : cria
+    SocialMediaFactory ..> LinkedInAdapter : cria
+
+    TwitterAdapter --|> ISocialMediaAdapter : implementa
+    TwitterAdapter --> TwitterAPI : adapta
+    InstagramAdapter --|> ISocialMediaAdapter : implementa
+    InstagramAdapter --> InstagramAPI : adapta
+    LinkedInAdapter --|> ISocialMediaAdapter : implementa
+    LinkedInAdapter --> LinkedInAPI : adapta
+
+    ISocialMediaAdapter ..> models.Conteudo : usa
+    ISocialMediaAdapter ..> models.PublicacaoResposta : usa
+    ISocialMediaAdapter ..> models.Estatisticas : usa
